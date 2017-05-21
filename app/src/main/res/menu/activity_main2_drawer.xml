@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/asignaturas"
+            android:icon="@drawable/ic_asignaturas"
+            android:title="@string/asignaturas" />
+        <item
+            android:id="@+id/estudiantes"
+            android:icon="@drawable/ic_estudiantes"
+            android:title="@string/estudiantes" />
+        <item
+            android:id="@+id/tareas"
+            android:icon="@drawable/ic_tareas"
+            android:title="@string/tareas" />
+
+</group>
+</menu>
