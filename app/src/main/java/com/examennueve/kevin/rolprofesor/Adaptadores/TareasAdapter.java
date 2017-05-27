@@ -3,6 +3,9 @@ package com.examennueve.kevin.rolprofesor.Adaptadores;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,7 +24,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.examennueve.kevin.rolprofesor.Fragmentos.tareas;
+import com.examennueve.kevin.rolprofesor.Main2Activity;
 import com.examennueve.kevin.rolprofesor.R;
 
 import org.json.JSONArray;
@@ -66,6 +72,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         holder.nota.setText(tareasList.get(position).getNota());
         holder.materia.setText("ID asignatura: "+tareasList.get(position).getIdasignatura());
         holder.alumno.setText("Id Alumno: "+tareasList.get(position).getIdusuario_alumn());
+        holder.idtarea.setText(tareasList.get(position).getIdtarea());
 
         final Tareas mTareas = tareasList.get(position);
 
@@ -73,7 +80,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         holder.btn_editar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                metodo_editar(mTareas.getNombre(), mTareas.getNota());
+                metodo_editar(mTareas.getIdtarea(),mTareas.getNombre(), mTareas.getNota());
             }
         });
 
@@ -92,7 +99,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
 
     public class TareasHolder extends RecyclerView.ViewHolder{
 
-        TextView alumno,nombre,materia,nota;
+        TextView alumno,nombre,materia,nota,idtarea;
         ImageButton btn_editar, btn_eliminar;
         public TareasHolder(View itemView) {
             super(itemView);
@@ -102,6 +109,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
             nota = (TextView)itemView.findViewById(R.id.textView_nota);
             btn_editar = (ImageButton)itemView.findViewById(R.id.imageButton_edit);
             btn_eliminar = (ImageButton)itemView.findViewById(R.id.imageButton_delete);
+            idtarea = (TextView)itemView.findViewById(R.id.txtidTarea);
         }
     }
 
@@ -109,7 +117,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
     //-----------------------------METODOS DE LOS BOTOONES DEL ITEM**********************************
     //********************************************************************************************//
 
-    private void metodo_editar(String nombre, String nota){
+    private void metodo_editar(final String id, String nombre, String nota){
 
         //Construye el Dialogo
         LayoutInflater inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -118,11 +126,11 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         builder.setView(dialogView);
 
         //Casteo de los EditTExt
-        EditText nombreEdit = (EditText)dialogView.findViewById(R.id.editText_nombreTarea);
-        EditText notaEdit  = (EditText)dialogView.findViewById(R.id.editText_nota);
+        final EditText nombreTareaEdit = (EditText)dialogView.findViewById(R.id.editText_nombreTarea);
+        final EditText notaEdit  = (EditText)dialogView.findViewById(R.id.editText_nota);
 
         //Setear EditText
-        nombreEdit.setText(nombre);
+        nombreTareaEdit.setText(nombre);
         notaEdit.setText(nota);
 
         //////////////SPINER ASIGNATURAS//////////////////////
@@ -140,7 +148,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 materiaSeleccionada = spinnerAsignatura.getSelectedItem().toString();
-                //idmateriaSeleccionada = codAsigna.get(position);
+                idmateriaSeleccionada = codAsigna.get(position);
             }
 
             @Override
@@ -167,6 +175,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 estudianteSeleccionado = spinnerEstudiantes.getSelectedItem().toString();
+                idestudianteSeleccionado = codEstu.get(position);
             }
 
             @Override
@@ -179,7 +188,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                actualizarTarea();
+                actualizarTarea(id,nombreTareaEdit.getText().toString(),notaEdit.getText().toString(),idmateriaSeleccionada,idestudianteSeleccionado);
             }
         });
 
@@ -270,7 +279,32 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         }
     }
 
-    private void actualizarTarea(){
+    private void actualizarTarea(String id, String nombreTarea, String nota, String materia, final String alumno){
 
+        JSONObject jsonObject = new JSONObject();
+        try{
+           jsonObject.put("idusuario_prof",id).put("nombre",nombreTarea).put("nota",nota).put("idusuario_alum",alumno)
+                   .put("idasignatura",materia);
+        }catch (JSONException e){}
+
+
+        String url = "http://192.168.1.8:8084/WebServiceExamNueve/webapi/tareas/";
+        RequestQueue queue = Volley.newRequestQueue(activity);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT , url+id, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(activity,"Modificado correctamente",Toast.LENGTH_SHORT).show();
+                
+            }
+        });
+        queue.add(jsonObjectRequest);
     }
+
+
 }
