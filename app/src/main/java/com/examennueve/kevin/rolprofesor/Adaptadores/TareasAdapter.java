@@ -300,7 +300,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(activity,"Modificado correctamente",Toast.LENGTH_SHORT).show();
-                
+
             }
         });
         queue.add(jsonObjectRequest);

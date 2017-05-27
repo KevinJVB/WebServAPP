@@ -62,7 +62,7 @@ public class tareas extends Fragment {
         // Required empty public constructor
     }
 
-
+    RecyclerView recyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,7 +75,7 @@ public class tareas extends Fragment {
 
 
         //RecyclerView
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerviewTareas);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerviewTareas);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
 
@@ -130,6 +130,7 @@ public class tareas extends Fragment {
             try {
                 JSONObject item = jsonArray.getJSONObject(i);
                 Tareas tarea = new Tareas();
+                tarea.setIdtarea(item.getString("idtarea"));
                 tarea.setNombre(item.getString("nombre"));
                 tarea.setNota(item.getString("nota"));
                 tarea.setIdasignatura(item.getString("idasignatura"));
@@ -333,6 +334,10 @@ public class tareas extends Fragment {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void actualizarDatos(){
+        recyclerView.setAdapter(adapterRecycler);
     }
 
 }
