@@ -19,12 +19,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.examennueve.kevin.rolprofesor.Fragmentos.tareas;
 import com.examennueve.kevin.rolprofesor.Main2Activity;
@@ -35,6 +37,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by kevin on 12/05/2017.
@@ -66,7 +70,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
     }
 
     @Override
-    public void onBindViewHolder(TareasHolder holder, int position) {
+    public void onBindViewHolder(TareasHolder holder, final int position) {
 
         holder.nombre.setText(tareasList.get(position).getNombre());
         holder.nota.setText(tareasList.get(position).getNota());
@@ -80,17 +84,18 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         holder.btn_editar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                metodo_editar(mTareas.getIdtarea(),mTareas.getNombre(), mTareas.getNota());
+                metodo_editar(mTareas.getIdtarea(),mTareas.getNombre(), mTareas.getNota(),position);
             }
         });
 
         holder.btn_eliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                metodo_delete(mTareas.getIdtarea(),position);
             }
         });
     }
+
 
     @Override
     public int getItemCount() {
@@ -117,7 +122,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
     //-----------------------------METODOS DE LOS BOTOONES DEL ITEM**********************************
     //********************************************************************************************//
 
-    private void metodo_editar(final String id, String nombre, String nota){
+    private void metodo_editar(final String id, String nombre, String nota, final int posicion){
 
         //Construye el Dialogo
         LayoutInflater inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -188,14 +193,43 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                actualizarTarea(id,nombreTareaEdit.getText().toString(),notaEdit.getText().toString(),idmateriaSeleccionada,idestudianteSeleccionado);
+                actualizarTarea(id,nombreTareaEdit.getText().toString(),notaEdit.getText().toString(),idmateriaSeleccionada,idestudianteSeleccionado,posicion);
             }
         });
 
         builder.create().show();
     }
 
+    private void metodo_delete(String idtarea, final int position) {
+        RequestQueue requestQueue = Volley.newRequestQueue(activity);
+        String url = "http://192.168.1.8:8084/WebServiceExamNueve/webapi/tareas/";
+        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url + idtarea,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Toast.makeText(activity,"Eliminado correctamente",Toast.LENGTH_SHORT).show();
+                        notifyItemRemoved(position);
+                        tareasList.remove(position);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
 
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type","application/json;charset=utf-8");
+                return headers;
+            }
+        };
+        requestQueue.add(stringRequest);
+    }
+
+    //********************************************************************************************//
+    //-----------------------------METODOS PARA DESEREALIZAR**********************************
+    //********************************************************************************************//
 
     private void obtenerMaterias(){
         RequestQueue queue = Volley.newRequestQueue(activity);
@@ -279,7 +313,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         }
     }
 
-    private void actualizarTarea(String id, String nombreTarea, String nota, String materia, final String alumno){
+    private void actualizarTarea(final String id, final String nombreTarea, final String nota, String materia, final String alumno,final int pos){
 
         JSONObject jsonObject = new JSONObject();
         try{
@@ -300,7 +334,8 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(activity,"Modificado correctamente",Toast.LENGTH_SHORT).show();
-
+                tareasList.set(pos,new Tareas(id,idmateriaSeleccionada,idestudianteSeleccionado,nombreTarea,nota));
+                notifyItemChanged(pos);
             }
         });
         queue.add(jsonObjectRequest);
