@@ -12,9 +12,17 @@ public class Tareas {
     private String idusuario_alumn;
     private String nombre;
     private String nota;
-
+//id,idmateriaSeleccionada,idestudianteSeleccionado,nombreTarea,nota
     public Tareas(){
 
+    }
+
+    public Tareas(String idtarea, String idasignatura, String idusuario_prof, String nombre, String nota) {
+        this.idtarea = idtarea;
+        this.idasignatura = idasignatura;
+        this.idusuario_prof = idusuario_prof;
+        this.nombre = nombre;
+        this.nota = nota;
     }
 
     public Tareas(String idtarea, String idasignatura, String idusuario_prof, String idusuario_alumn, String nombre, String nota) {
