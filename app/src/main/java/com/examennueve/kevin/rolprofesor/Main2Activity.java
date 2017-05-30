@@ -45,6 +45,7 @@ public class Main2Activity extends AppCompatActivity
     //[{"id_asignatura":1,"nombre_asignatura":"Matematica"},{"id_asignatura":2,"nombre_asignatura":"Ciencias quimicas"}]
     Bundle args;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -164,7 +165,8 @@ public class Main2Activity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.asignaturas) {
-
+            Intent i = new Intent(this,Main2Activity.class);
+            startActivity(i);
         } else if (id == R.id.estudiantes) {
             this.setTitle("Estudiantes");
             fragmentoGenerico = new estudiantes();

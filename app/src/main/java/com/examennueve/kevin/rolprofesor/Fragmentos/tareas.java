@@ -2,6 +2,7 @@ package com.examennueve.kevin.rolprofesor.Fragmentos;
 
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -31,6 +32,7 @@ import com.examennueve.kevin.rolprofesor.Adaptadores.Asignatura;
 import com.examennueve.kevin.rolprofesor.Adaptadores.Tareas;
 import com.examennueve.kevin.rolprofesor.Adaptadores.TareasAdapter;
 import com.examennueve.kevin.rolprofesor.Adaptadores.UsuariosAdapter;
+import com.examennueve.kevin.rolprofesor.Provider.ProveedorTareas;
 import com.examennueve.kevin.rolprofesor.R;
 
 import org.json.JSONArray;
@@ -228,7 +230,6 @@ public class tareas extends Fragment {
                             @Override
                             public void onResponse(JSONObject response) {
                                 Toast.makeText(getContext(),"Ok",Toast.LENGTH_SHORT).show();
-                                tareasList.add(new Tareas("1","1","2","1",nombreTarea,notaTarea));
                                 adapterRecycler.notifyDataSetChanged();
                             }
                         }, new Response.ErrorListener() {
@@ -250,6 +251,8 @@ public class tareas extends Fragment {
             }
         });
 
+        ContentValues values = new ContentValues();
+        values.put(ProveedorTareas.nom_tarea, String.valueOf(nombreAsigna));
         builder.create().show();
     }
 
