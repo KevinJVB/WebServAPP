@@ -32,7 +32,6 @@ import com.examennueve.kevin.rolprofesor.Adaptadores.Asignatura;
 import com.examennueve.kevin.rolprofesor.Adaptadores.Tareas;
 import com.examennueve.kevin.rolprofesor.Adaptadores.TareasAdapter;
 import com.examennueve.kevin.rolprofesor.Adaptadores.UsuariosAdapter;
-import com.examennueve.kevin.rolprofesor.Provider.ProveedorTareas;
 import com.examennueve.kevin.rolprofesor.R;
 
 import org.json.JSONArray;
@@ -75,20 +74,22 @@ public class tareas extends Fragment {
         Bundle b = getArguments();
         idprofesor = b.getString("llaveIdProfe");
 
-
         //RecyclerView
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerviewTareas);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
 
-        adapterRecycler = new TareasAdapter(getActivity(), tareasList);
+        adapterRecycler = new TareasAdapter(getActivity(), tareasList,idprofesor);
         recyclerView.setAdapter(adapterRecycler);
+
+
 
         //Dialogo y JSON para llamar a desrealizarlo y mostrarlo
         RequestQueue queue = Volley.newRequestQueue(getContext());
         final ProgressDialog dialog = new ProgressDialog(getContext());
         dialog.setMessage("Por favor espere...");
         dialog.show();
+
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url,
                 new Response.Listener<JSONArray>() {
@@ -102,9 +103,7 @@ public class tareas extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getContext(),
-                                "Error al realizar la petición\n" + error.getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "Error al realizar la petición\n" + error.getMessage(), Toast.LENGTH_SHORT).show();
                         if (dialog.isShowing()) dialog.dismiss();
                     }
                 });
@@ -125,7 +124,6 @@ public class tareas extends Fragment {
 
     }
 
-
     public void deserializarJSONArray(JSONArray jsonArray) {
 
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -140,7 +138,7 @@ public class tareas extends Fragment {
 
                 tareasList.add(tarea);
             } catch (JSONException e) {
-                Toast.makeText(getContext(), "Error al procesar la respuesta de la petición",
+                Toast.makeText(getContext(), "Error al procesar la respuesta de la petición TAREA",
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -221,7 +219,6 @@ public class tareas extends Fragment {
                 try{
                     jsonObject.put("idasignatura",idmateriaSeleccionada).put("idusuario_prof",idprofesor)
                             .put("idusuario_alum",idestudianteSeleccionado).put("nombre",nombreTarea).put("nota",notaTarea);
-
                 }catch (JSONException e){e.printStackTrace();}
 
                 RequestQueue queue = Volley.newRequestQueue(getContext());
@@ -229,30 +226,33 @@ public class tareas extends Fragment {
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
-                                Toast.makeText(getContext(),"Ok",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(),"Ok agregado correcamente",Toast.LENGTH_SHORT).show();
+                                String idtarea=null;
+                                try {
+                                    idtarea = response.getString("idtarea");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                Tareas tareas = new Tareas();
+                                tareas.setIdtarea(idtarea);
+                                tareas.setIdusuario_alumn(idestudianteSeleccionado);
+                                tareas.setIdasignatura(idmateriaSeleccionada);
+                                tareas.setNombre(nombreTarea);
+                                tareas.setNota(notaTarea);
+                                tareasList.add(tareas);
                                 adapterRecycler.notifyDataSetChanged();
                             }
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Tareas tareas = new Tareas();
-                        tareas.setIdasignatura(idmateriaSeleccionada);
-                        tareas.setNombre(nombreTarea);
-                        tareas.setNota(notaTarea);
-                        tareasList.add(tareas);
-                        adapterRecycler.notifyDataSetChanged();
-                        Log.i("Errorrrr",String.valueOf(error));
+                        Log.i("Error",String.valueOf(error));
                     }
                 });
-
                 queue.add(jsonObjectRequest);
-
                 dialog.dismiss();
             }
         });
 
-        ContentValues values = new ContentValues();
-        values.put(ProveedorTareas.nom_tarea, String.valueOf(nombreAsigna));
         builder.create().show();
     }
 
@@ -265,15 +265,12 @@ public class tareas extends Fragment {
                     @Override
                     public void onResponse(JSONArray response) {
                         deserializarJSONArray2(response);
-
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getContext(),
-                                "Error al realizar la petición\n" + error.getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "Error al realizar la petición\n" + error.getMessage(), Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -309,7 +306,7 @@ public class tareas extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getContext(),
-                                "Error al realizar la petición\n" + error.getMessage(),
+                                "Error al realizar la petición OBTENER ESTUDIANTES\n" + error.getMessage(),
                                 Toast.LENGTH_SHORT).show();
 
                     }
@@ -337,10 +334,6 @@ public class tareas extends Fragment {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void actualizarDatos(){
-        recyclerView.setAdapter(adapterRecycler);
     }
 
 }
