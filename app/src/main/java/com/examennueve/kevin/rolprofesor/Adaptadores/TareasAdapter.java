@@ -55,9 +55,13 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
     ArrayList<String> codEstu;
     String materiaSeleccionada, estudianteSeleccionado, idmateriaSeleccionada, idestudianteSeleccionado;
 
-    public TareasAdapter(Activity activity, ArrayList<Tareas> tareasList) {
+    String idprofesor;
+
+
+    public TareasAdapter(Activity activity, ArrayList<Tareas> tareasList,String idprofesor) {
         this.activity = activity;
         this.tareasList = tareasList;
+        this.idprofesor = idprofesor;
     }
 
     @Override
@@ -122,6 +126,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
     //-----------------------------METODOS DE LOS BOTOONES DEL ITEM**********************************
     //********************************************************************************************//
 
+    //Metodo editar
     private void metodo_editar(final String id, String nombre, String nota, final int posicion){
 
         //Construye el Dialogo
@@ -317,10 +322,9 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
 
         JSONObject jsonObject = new JSONObject();
         try{
-           jsonObject.put("idusuario_prof",id).put("nombre",nombreTarea).put("nota",nota).put("idusuario_alum",alumno)
-                   .put("idasignatura",materia);
+           jsonObject.put("idtarea",id).put("nombre",nombreTarea).put("nota",nota).put("idusuario_alum",alumno)
+                   .put("idasignatura",materia).put("idusuario_prof",idprofesor);
         }catch (JSONException e){}
-
 
         String url = "http://192.168.1.8:8084/WebServiceExamNueve/webapi/tareas/";
         RequestQueue queue = Volley.newRequestQueue(activity);
@@ -328,14 +332,14 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-
+                        Toast.makeText(activity,"Modificado correctamente",Toast.LENGTH_SHORT).show();
+                        tareasList.set(pos,new Tareas(id,idmateriaSeleccionada,idprofesor,idestudianteSeleccionado,nombreTarea,nota));
+                        notifyItemChanged(pos);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(activity,"Modificado correctamente",Toast.LENGTH_SHORT).show();
-                tareasList.set(pos,new Tareas(id,idmateriaSeleccionada,idestudianteSeleccionado,nombreTarea,nota));
-                notifyItemChanged(pos);
+                Toast.makeText(activity,"Error "+error,Toast.LENGTH_SHORT).show();
             }
         });
         queue.add(jsonObjectRequest);
