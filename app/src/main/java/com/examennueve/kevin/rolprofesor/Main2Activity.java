@@ -125,6 +125,7 @@ public class Main2Activity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.asignaturas) {
+            this.setTitle("Asignaturas");
             fragmentoGenerico = new asignaturas();
         } else if (id == R.id.estudiantes) {
             this.setTitle("Estudiantes");
