@@ -2,11 +2,9 @@ package com.examennueve.kevin.rolprofesor.Fragmentos;
 
 
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -83,7 +81,6 @@ public class tareas extends Fragment {
         recyclerView.setAdapter(adapterRecycler);
 
 
-
         //Dialogo y JSON para llamar a desrealizarlo y mostrarlo
         RequestQueue queue = Volley.newRequestQueue(getContext());
         final ProgressDialog dialog = new ProgressDialog(getContext());
@@ -103,7 +100,7 @@ public class tareas extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(getContext(), "Error al realizar la petición\n" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error al realizar la petición  \n" + error.getMessage(), Toast.LENGTH_SHORT).show();
                         if (dialog.isShowing()) dialog.dismiss();
                     }
                 });
@@ -138,7 +135,7 @@ public class tareas extends Fragment {
 
                 tareasList.add(tarea);
             } catch (JSONException e) {
-                Toast.makeText(getContext(), "Error al procesar la respuesta de la petición TAREA",
+                Toast.makeText(getContext(), "Error al procesar la respuesta de la petición tarea",
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -270,7 +267,7 @@ public class tareas extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(getContext(), "Error al realizar la petición\n" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error al realizar la petición Obtener materias \n" + error.getMessage(), Toast.LENGTH_SHORT).show();
 
                     }
                 });
@@ -299,14 +296,13 @@ public class tareas extends Fragment {
                     @Override
                     public void onResponse(JSONArray response) {
                         deserializarJSONArray3(response);
-
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getContext(),
-                                "Error al realizar la petición OBTENER ESTUDIANTES\n" + error.getMessage(),
+                                "Error al realizar la petición estudiantes \n" + error.getMessage(),
                                 Toast.LENGTH_SHORT).show();
 
                     }

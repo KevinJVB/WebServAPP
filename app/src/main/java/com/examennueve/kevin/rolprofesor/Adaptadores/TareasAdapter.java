@@ -57,7 +57,6 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
 
     String idprofesor;
 
-
     public TareasAdapter(Activity activity, ArrayList<Tareas> tareasList,String idprofesor) {
         this.activity = activity;
         this.tareasList = tareasList;
@@ -107,7 +106,6 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
     }
 
     public class TareasHolder extends RecyclerView.ViewHolder{
-
         TextView alumno,nombre,materia,nota,idtarea;
         ImageButton btn_editar, btn_eliminar;
         public TareasHolder(View itemView) {
@@ -119,8 +117,17 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
             btn_editar = (ImageButton)itemView.findViewById(R.id.imageButton_edit);
             btn_eliminar = (ImageButton)itemView.findViewById(R.id.imageButton_delete);
             idtarea = (TextView)itemView.findViewById(R.id.txtidTarea);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(activity,"Tengo posicion "+String.valueOf(getPosition()),Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
+
+
 
     //********************************************************************************************//
     //-----------------------------METODOS DE LOS BOTOONES DEL ITEM**********************************
@@ -205,6 +212,7 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
         builder.create().show();
     }
 
+    //Metodo delete
     private void metodo_delete(String idtarea, final int position) {
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
         String url = "http://192.168.1.8:8084/WebServiceExamNueve/webapi/tareas/";
@@ -212,9 +220,11 @@ public class TareasAdapter extends RecyclerView.Adapter<TareasAdapter.TareasHold
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Toast.makeText(activity,"Eliminado correctamente",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity,"Eliminado correctamente el "+position,Toast.LENGTH_SHORT).show();
                         notifyItemRemoved(position);
                         tareasList.remove(position);
+                        Toast.makeText(activity,"Quedan "+String.valueOf(tareasList.size()),Toast.LENGTH_SHORT).show();
+
                     }
                 }, new Response.ErrorListener() {
             @Override

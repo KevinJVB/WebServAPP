@@ -82,25 +82,7 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-    /*
-    //Metodo desrealizar
-    public void deserializarJSONArray(JSONArray jsonArray) {
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            try {
-                JSONObject item = jsonArray.getJSONObject(i);
-                Asignatura asignatura = new Asignatura();
-                asignatura.setId_asignatura(item.getString("id_asignatura"));
-                asignatura.setNombre_asignatura(item.getString("nombre_asignatura"));
-
-                asignaturas.add(asignatura);
-            } catch (JSONException e) {
-                Toast.makeText(this, "Error al procesar la respuesta de la petición",
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-*/
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
