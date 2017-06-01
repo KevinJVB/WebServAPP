@@ -1,5 +1,6 @@
 package com.examennueve.kevin.rolprofesor;
 
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.examennueve.kevin.rolprofesor.Adaptadores.Asignatura;
 import com.examennueve.kevin.rolprofesor.Adaptadores.AsignaturaAdapter;
+import com.examennueve.kevin.rolprofesor.Fragmentos.asignaturas;
 import com.examennueve.kevin.rolprofesor.Fragmentos.estudiantes;
 import com.examennueve.kevin.rolprofesor.Fragmentos.tareas;
 
@@ -67,45 +69,21 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Recycler View
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2,
-                GridLayoutManager.VERTICAL, false));
-
-        final AsignaturaAdapter adapter = new AsignaturaAdapter(this, asignaturas);
-        recyclerView.setAdapter(adapter);
-
-        //Dialogo y JSON para llamar a desrealizarlo y mostrarlo
-        RequestQueue queue = Volley.newRequestQueue(this);
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage("Por favor espere...");
-        dialog.show();
-
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        deserializarJSONArray(response);
-                        adapter.notifyDataSetChanged();
-                        if (dialog.isShowing()) dialog.dismiss();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(),
-                                "Error al realizar la petición\n"+error.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                        if (dialog.isShowing()) dialog.dismiss();
-                    }
-                });
-        queue.add(jsonArrayRequest);
-
+        Fragment fragmentoGenerico = null;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentoGenerico = new asignaturas();
+        if (fragmentoGenerico != null) {
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content_main2, fragmentoGenerico)
+                    .commit();
+                    navigationView.getMenu().getItem(0).setChecked(true);
+        }
     }
 
-    //Metodo desrealizar
 
+    /*
+    //Metodo desrealizar
     public void deserializarJSONArray(JSONArray jsonArray) {
 
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -122,7 +100,7 @@ public class Main2Activity extends AppCompatActivity
             }
         }
     }
-
+*/
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -165,8 +143,7 @@ public class Main2Activity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.asignaturas) {
-            Intent i = new Intent(this,Main2Activity.class);
-            startActivity(i);
+            fragmentoGenerico = new asignaturas();
         } else if (id == R.id.estudiantes) {
             this.setTitle("Estudiantes");
             fragmentoGenerico = new estudiantes();
